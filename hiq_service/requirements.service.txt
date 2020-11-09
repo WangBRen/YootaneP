@@ -1,0 +1,14 @@
+Django==2.0.2
+django-extensions==1.9.8
+djangorestframework==3.7.3
+pytest==3.3.0
+djangorestframework==3.7.3
+six==1.11.0
+djangorestframework-jwt==1.11.0
+requests==2.18.4
+celery==5.0.1
+redis==2.10.6
+pymysql==0.8.0
+oss2==2.4.0
+pymongo==3.6.1
+zhinst
