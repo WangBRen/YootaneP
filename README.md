@@ -59,14 +59,17 @@
     docker-compose up --build
     ```
 
-- Sprint Boot Swagger-UI should now be ready
-    - https://127.0.0.1/swagger-ui.html
+- Hardware Control Interface should now be ready
+    - hiq_service/hiq_service/tasks 设备控制
+    - hiq_service/hiq_service/views 接口
+
+- 已关闭部分服务 详情见docker-compose文件
 
 ## 各个后台入口
 
 |入口|地址|用户名|密码|
 |-|-|-|-|
-|Sprint Boot Swagger UI|https://127.0.0.1/swagger-ui.html|无|无|
+<!-- |Sprint Boot Swagger UI|https://127.0.0.1/swagger-ui.html|无|无| -->
 |RabbitMQ 队列服务|http://127.0.0.1:15672|`admin`|`HiqControl`|
 |Redis 键值数据库|http://127.0.0.1:8081|无|无|
 

@@ -1,8 +1,0 @@
-requests==2.18.4
-celery==4.1.0
-redis==2.10.6
-matplotlib==2.1.2
-opencv_python==3.4.1
-jieba==0.39
-oss2==2.4.0
-PyMySQL==0.8.0
