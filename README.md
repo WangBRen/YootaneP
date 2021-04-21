@@ -63,6 +63,16 @@
     - hiq_service/hiq_service/tasks 设备控制
     - hiq_service/hiq_service/views 接口
 
+- Frontend
+    ```text
+    cd frontend
+    ```
+
+    ```text
+    npm install
+    npm start
+    ```
+
 - 已关闭部分服务 详情见docker-compose文件
 
 ## 各个后台入口
@@ -72,4 +82,6 @@
 <!-- |Sprint Boot Swagger UI|https://127.0.0.1/swagger-ui.html|无|无| -->
 |RabbitMQ 队列服务|http://127.0.0.1:15672|`admin`|`HiqControl`|
 |Redis 键值数据库|http://127.0.0.1:8081|无|无|
+|历史任务数据库 HiQASM 'host': '139.159.177.11', 'password': 'password', 'port': 3306, 'user': 'root'  
+
 
