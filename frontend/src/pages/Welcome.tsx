@@ -4,6 +4,7 @@ import { Card, Alert, Typography, Button, message } from 'antd';
 import { useIntl, FormattedMessage } from 'umi';
 import styles from './Welcome.less';
 import NewPage from '@/pages/CodeEditor/CodeEditor';
+import QCircuit from '@/components/QCircuit/thing';
 import 'codemirror/lib/codemirror.css'; // 主题风格
 
 import 'codemirror/theme/solarized.css'; // 代码模式，clike是包含java,c++等模式的
@@ -20,9 +21,11 @@ const CodePreview: React.FC = ({ children }) => (
 
 export default (): React.ReactNode => {
   const intl = useIntl();
+  console.log(QCircuit)
   return (
     <PageContainer>
-      <NewPage/>
+      {/* <NewPage/> */}
+      <QCircuit/>
       {/* <Card>
         <Alert
           message={intl.formatMessage({
