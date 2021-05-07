@@ -29,12 +29,15 @@ import ReactDOM from 'react-dom';
 import { blocksJSX, blocksConfig, palette } from './quantumBlocks';
 
 import { UnControlled as CodeMirror } from 'react-codemirror2';
+import { sendCode } from '@/services/code';
 import 'codemirror/lib/codemirror.css'; // 主题风格
 
 import 'codemirror/theme/solarized.css'; // 代码模式，clike是包含java,c++等模式的
 import 'codemirror/theme/seti.css'; // 代码模式，clike是包含java,c++等模式的
 
 import 'codemirror/mode/clike/clike';
+
+
 
 
 var debounce = (fn, wait) => {
@@ -143,12 +146,33 @@ export class QuantumCircuit extends React.PureComponent {
   };
 
   prompt = async() => {
-    // const msg = await sendCode(this.state.value);
+    const msg = await sendCode(this.state.value);
     notification.open({
       message: '提交了代码:',
       description: <span dangerouslySetInnerHTML={{ __html: this.state.value }} />,
     });
   };
+
+
+  add = async() => {
+    console.log("add")
+    var qregs = this.state.qregs
+    qregs.push({name: 'q['+this.state.qregs.length+']'},) 
+    console.log(qregs)
+    this.setState({
+      qregs,
+    });
+    this.renderLabels()
+  }
+
+  delete = async() => {
+    var qregs = this.state.qregs
+    qregs.pop()
+    this.setState({
+      qregs,
+    });
+    this.renderLabels()
+  }
 
   componentDidMount() {
     let blockName = '';
@@ -1324,7 +1348,18 @@ export class QuantumCircuit extends React.PureComponent {
                 margin: 12,
               }}
               type="primary" onClick={this.gen}>生成线路</Button>
+            <Button 
+              style={{
+                margin: 12,
+              }}
+              type="primary" onClick={this.add}>+</Button>
+            <Button 
+              style={{
+                margin: 12,
+              }}
+              type="primary" onClick={this.delete}>—</Button>
       </Card>
+      <Card title="线路编辑器">
         <CardContent>
 
         {this.renderBlocksPalette()}
@@ -1389,17 +1424,8 @@ export class QuantumCircuit extends React.PureComponent {
                   </g>
                 </svg>
               </div>
-              <Button 
-              style={{
-                margin: 12,
-              }}
-              type="primary" onClick={this.prompt}>+</Button>
-            <Button 
-              style={{
-                margin: 12,
-              }}
-              type="primary" onClick={this.gen}>—</Button>
         </CardContent>
+      </Card>
       </Card>
     )
   }
