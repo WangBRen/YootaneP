@@ -37,6 +37,8 @@ import 'codemirror/theme/seti.css'; // 代码模式，clike是包含java,c++等�
 
 import 'codemirror/mode/clike/clike';
 
+import ReactEcharts from 'echarts-for-react';
+
 
 
 
@@ -90,9 +92,11 @@ const styles = theme => ({
 const doubleClickTimeWindowMs = 500;
 
 
-export class QuantumCircuit extends React.PureComponent {
+export class QuantumCircuit extends React.Component {
 
   state = {
+    rate:[0, 0],
+    result: true,
     value: 'test',
     value_block: [],
     selectedBlock: null,
@@ -151,7 +155,21 @@ export class QuantumCircuit extends React.PureComponent {
       message: '提交了代码:',
       description: <span dangerouslySetInnerHTML={{ __html: this.state.value }} />,
     });
-  };
+    var rate = this.state.rate
+    if(rate[0] >= rate[1]){
+      rate[1] = rate[1] + 1
+    }else{
+      rate[0] = rate[0] + 1
+    }
+    // rate[0] = 100
+    // rate[1] = 101
+    console.log(rate)
+    this.setState({
+      rate
+    })
+    // this.getOption(rate)
+    // this.renderChart()
+    };
 
 
   add = async() => {
@@ -172,6 +190,27 @@ export class QuantumCircuit extends React.PureComponent {
       qregs,
     });
     this.renderLabels()
+  }
+
+  getOption = (rate) =>{
+    return {
+        title: {
+            // text: '结果'
+        },
+        tooltip: {},
+        legend: {
+            data:['概率']
+        },
+        xAxis: {
+            data: ["1","0"]
+        },
+        yAxis: {},
+        series: [{
+            name: '概率',
+            type: 'bar',
+            data: rate
+        }]
+    };
   }
 
   componentDidMount() {
@@ -1301,11 +1340,20 @@ export class QuantumCircuit extends React.PureComponent {
     )
   }
 
+  renderChart = () => {
+    const { rate, result } = this.state;
+    console.log("rate" + rate)
+    return (
+      <Card title="结果">
+        <ReactEcharts option={this.getOption(rate)} key={Date.now()}/>
+      </Card>
+    )
+  }
+
   render() {
     const { classes, windowWidth, windowHeight, currentBlockName,
       isIDE, isQControl, left, top, } = this.props;
-    const { selectedBlock, blockEditCtrls, qregs } = this.state;
-
+    const { selectedBlock, blockEditCtrls, qregs, result } = this.state;
     const selectedNonMeasureBlock = selectedBlock && this.getBlockById(selectedBlock).type != 'Measure'
     const editorHeight = 48 * qregs.length + 40
 
@@ -1426,6 +1474,7 @@ export class QuantumCircuit extends React.PureComponent {
               </div>
         </CardContent>
       </Card>
+      {this.renderChart()}
       </Card>
     )
   }

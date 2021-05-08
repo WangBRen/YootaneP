@@ -1,5 +1,5 @@
 import React ,{Component} from 'react';
-import {Card} from 'antd'
+import { Card } from 'antd'
 import ReactEcharts from 'echarts-for-react';
 class Bar extends Component{
     constructor(props){
@@ -15,7 +15,7 @@ class Bar extends Component{
     getOption = (rate) =>{
         return {
             title: {
-                text: 'ECharts 入门示例'
+                text: 'ECharts'
             },
             tooltip: {},
             legend: {
