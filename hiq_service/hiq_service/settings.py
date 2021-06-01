@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # 'django.contrib.messages',      # 本服务没有前端，不需要通知系统
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders'
     # 'djcelery'
 ]
 
@@ -56,6 +57,8 @@ MIDDLEWARE = [
     #'django.contrib.auth.middleware.AuthenticationMiddleware', # 本服务为纯内网服务，不需要认证
     #'django.contrib.messages.middleware.MessageMiddleware',    # 本服务没有前端，不需要通知系统
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware' ,  # 注册中间件
+    'django.middleware.common.CommonMiddleware' 
 ]
 
 ROOT_URLCONF = 'hiq_service.urls'
@@ -122,6 +125,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+CORS_ORIGIN_ALLOW_ALL  = True
 
 
 # Static files (CSS, JavaScript, Images)

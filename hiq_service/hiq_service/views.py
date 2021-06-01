@@ -7,6 +7,7 @@ from celery.result import AsyncResult
 from hiq_service.tasks import ask
 from hiq_service.tasks import app
 from hiq_service.Task import get_task_list, create_task
+from IOPTest import getResult
 import json
 
 @api_view(['POST'])
@@ -14,6 +15,10 @@ def question(request):
     result = ask.delay(request.data)
     return Response(result.id, status=status.HTTP_202_ACCEPTED)
 
+@api_view(['POST'])
+def iop(request):
+    result = getResult(request.data)
+    return Response(result, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def answer(request, pk):

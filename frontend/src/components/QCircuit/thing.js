@@ -39,8 +39,25 @@ import 'codemirror/mode/clike/clike';
 
 import ReactEcharts from 'echarts-for-react';
 
+import { InputNumber } from 'antd';
 
+import { Select, Spin } from 'antd';
+import { extend } from "umi-request";
 
+const { Option, OptGroup } = Select;
+
+const request = extend({
+  // timeout: 1000,
+  headers: {
+    "Content-Type": "application/json"
+  },
+  // params: {
+  //   token: "xxx" // 所有请求默认带上 token 参数
+  // },
+  errorHandler: function(error) {
+    /* 异常处理 */
+  }
+});
 
 var debounce = (fn, wait) => {
   let timeout1;
@@ -95,7 +112,9 @@ const doubleClickTimeWindowMs = 500;
 export class QuantumCircuit extends React.Component {
 
   state = {
-    rate:[0, 0],
+    loading: false,
+    rate:[],
+    options:[],
     result: true,
     value: 'test',
     value_block: [],
@@ -139,6 +158,75 @@ export class QuantumCircuit extends React.Component {
     });
   };
 
+  handleChangePlatform(value) {
+    console.log(`selected ${value}`);
+  }
+
+  onChange(value) {
+    console.log('changed', value);
+  }
+
+  trans(){
+    var op_list = this.state.blocks
+    var n = this.state.blocks.length
+    var pre_hiq = "from math import pi\n"+"import projectq\n"+"from projectq.backends import *\n"+"from projectq.ops import *\n"+"eng = projectq.MainEngine(backend=, verbose=True)\n"
+    // hiq_list=[[[] for col in range(10)] for row in range(10)]
+    var hiq_list=new Array();
+      for(var i=0;i<10;i++){
+        hiq_list[i]=new Array(); 
+        for(var j=0;j<10;j++){
+          hiq_list[i][j]=null;
+        }
+      }
+    var hiq = ''
+    for (k in range(n-1)){
+        for (i in range(n-1-k)){
+            if (op_list[i]['pos'][0]>op_list[i+1]['pos'][0]){
+                op_list[i],op_list[i+1] = op_list[i+1],op_list[i]
+            }
+        }
+    }
+    r=[0]*10
+    
+
+    for (i in range(n)){
+            k = op_list[i]['pos'][0]
+            j = op_list[i]['pos'][1]
+            hiq_list[k][j] = op_list[i]['type']           
+
+            
+            if  (j == 0){
+                hiq += hiq_list[k][j]
+                hiq += " | b1\n"
+                r[0] += 1
+                if (r[0] <= 1){
+                    pre_hiq += 'b1 =  eng.allocate_qubit()\n'
+                }
+            }
+            
+            if  (j == 1){
+                hiq += hiq_list[k][j]
+                hiq += " | b2\n"
+                r[1] += 1
+                if (r[1] <= 1){
+                    pre_hiq += 'b2 =  eng.allocate_qubit()\n'
+                }
+            }
+            
+            if  (j == 2){
+                hiq += hiq_list[k][j]
+                hiq += " | b3\n"
+                r[2] += 1
+                if (r[2] <= 1){
+                    pre_hiq += 'b3 =  eng.allocate_qubit()\n'
+                }
+    }
+    // print(pre_hiq+hiq)
+    }
+    return (pre_hiq+hiq)
+  }
+  // ReactDOM.render(<InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />, mountNode);
+
   gen = () => {
     console.log("生成线路")
     const data = JSON.parse(this.state.value)
@@ -150,23 +238,67 @@ export class QuantumCircuit extends React.Component {
   };
 
   prompt = async() => {
-    const msg = await sendCode(this.state.value);
+    var that = this 
     notification.open({
-      message: '提交了代码:',
+      message: '提交了任务:',
       description: <span dangerouslySetInnerHTML={{ __html: this.state.value }} />,
     });
-    var rate = this.state.rate
-    if(rate[0] >= rate[1]){
-      rate[1] = rate[1] + 1
-    }else{
-      rate[0] = rate[0] + 1
-    }
-    // rate[0] = 100
-    // rate[1] = 101
-    console.log(rate)
-    this.setState({
-      rate
+    this.setState({ loading: true });
+    request
+    .post("http://localhost:8002/iop/", {
+      data: this.state.value
     })
+    .then(function(response) {
+      console.log(response);
+      that.setState({ loading: false });
+      var str = response[0]
+      var data = JSON.parse(str)
+      var res = data.res
+      console.log(data);
+      var options = Object.keys(data.res) 
+      console.log(options)
+      let list = [];
+      for (var key in res) {
+          list.push(res[key])
+        }
+      var rate = list
+      console.log(options, rate)
+      that.setState({
+        rate,
+        options
+    })
+      notification.open({
+        message: '执行成功',
+      });
+      // return response
+    })
+    .catch(function(error) {
+      console.log(error);
+      that.setState({ loading: false });
+      notification.open({
+        message: '任务异常:',
+        description: <span dangerouslySetInnerHTML={{ __html: error }} />,
+      });
+      // return error
+    });
+   
+    // const msg = sendCode(this.state.value);
+    // this.setState({ loading: false });
+    // console.log(msg)
+
+    // var rate = this.state.rate
+    // if(rate[0] >= rate[1]){
+    //   rate[1] = rate[1] + 1
+    // }else{
+    //   rate[0] = rate[0] + 1
+    // }
+    // // rate[0] = 100
+    // // rate[1] = 101
+    // console.log(rate)
+    // this.setState({
+    //   rate
+    // })
+
     // this.getOption(rate)
     // this.renderChart()
     };
@@ -192,7 +324,7 @@ export class QuantumCircuit extends React.Component {
     this.renderLabels()
   }
 
-  getOption = (rate) =>{
+  getOption = (rate, options) =>{
     return {
         title: {
             // text: '结果'
@@ -202,7 +334,7 @@ export class QuantumCircuit extends React.Component {
             data:['概率']
         },
         xAxis: {
-            data: ["1","0"]
+            data: options
         },
         yAxis: {},
         series: [{
@@ -1341,12 +1473,15 @@ export class QuantumCircuit extends React.Component {
   }
 
   renderChart = () => {
-    const { rate, result } = this.state;
+    const { rate, result, options } = this.state;
     console.log("rate" + rate)
     return (
+      <Spin spinning={this.state.loading}>
       <Card title="结果">
-        <ReactEcharts option={this.getOption(rate)} key={Date.now()}/>
+        <ReactEcharts option={this.getOption(rate, options)} key={Date.now()}/>
       </Card>
+    </Spin>
+
     )
   }
 
@@ -1377,11 +1512,11 @@ export class QuantumCircuit extends React.Component {
                 theme: 'seti',
                 lineNumbers: true,
               }} // 这个必须加上，否则在一些情况下，第二次打开就会有问题
-              onBeforeChange={(editor, data, value) => {
-                console.log('onBeforeChange fresh');
-                console.log(JSON.stringify(data));
-                console.log(JSON.stringify(value));
-              }}
+              // onBeforeChange={(editor, data, value) => {
+              //   console.log('onBeforeChange fresh');
+              //   console.log(JSON.stringify(data));
+              //   console.log(JSON.stringify(value));
+              // }}
               value={this.state.value} 
               onChange={(editor, data, value) => this.handleChange(value)}
               /* HERE: pick out only the value. and might as well get name. */
@@ -1406,6 +1541,17 @@ export class QuantumCircuit extends React.Component {
                 margin: 12,
               }}
               type="primary" onClick={this.delete}>—</Button>
+              shots  <InputNumber min={1} max={10000} defaultValue={1024} onChange={this.onChange} />
+              Platform <Select defaultValue="HiQ" style={{ width: 200 }} onChange={this.handleChangePlatform}>
+    <OptGroup label="Simulator">
+      <Option value="HiQ">HiQ</Option>
+      <Option value="ProjectQ">ProjectQ</Option>
+    </OptGroup>
+    <OptGroup label="Hardware">
+      <Option value="Sustech">Sustech</Option>
+      <Option value="IOP">IOP</Option>
+    </OptGroup>
+  </Select>
       </Card>
       <Card title="线路编辑器">
         <CardContent>

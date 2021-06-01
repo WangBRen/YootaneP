@@ -1,10 +1,30 @@
-import { request } from 'umi';
+// import { request } from 'umi';
+import { extend } from "umi-request";
 
-export async function sendCode(code: string) {
-    //IOP interface
-    // return request('/question', {
-    //     method: 'POST',
-    //     data: {code: code},
-    //   });
-    return "成功发送"
+const request = extend({
+  // timeout: 1000,
+  headers: {
+    "Content-Type": "application/json"
+  },
+  // params: {
+  //   token: "xxx" // 所有请求默认带上 token 参数
+  // },
+  errorHandler: function(error) {
+    /* 异常处理 */
+  }
+});
+export async function sendCode(code: object) {
+  request
+    .post("http://localhost:8002/iop/", {
+      data: code
+    })
+    .then(function(response) {
+      console.log(response);
+      return response
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+
+
   }
