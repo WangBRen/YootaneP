@@ -24,8 +24,10 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     url(r'^question/$', views.question),
+    url(r'^question_iop/$', views.question_iop),
     url(r'^iop/$', views.iop),
     url(r'^question/(?P<pk>[a-zA-Z0-9]{8}-([a-zA-Z0-9]{4}-){3}[a-zA-Z0-9]{12})/$', views.answer),
+    url(r'^question_iop/(?P<pk>[a-zA-Z0-9]{8}-([a-zA-Z0-9]{4}-){3}[a-zA-Z0-9]{12})/$', views.answer_iop),
     url(r'^task/$', views.task),
     url(r'^tasks', views.get_task),
 ]

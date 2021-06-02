@@ -4,15 +4,20 @@ from rest_framework.response import Response
 
 from celery.result import AsyncResult
 
-from hiq_service.tasks import ask
+from hiq_service.tasks import ask, ask_iop
 from hiq_service.tasks import app
 from hiq_service.Task import get_task_list, create_task
-from IOPTest import getResult
+from iop import getResult
 import json
 
 @api_view(['POST'])
 def question(request):
     result = ask.delay(request.data)
+    return Response(result.id, status=status.HTTP_202_ACCEPTED)
+
+@api_view(['POST'])
+def question_iop(request):
+    result = ask_iop.delay(request.data)
     return Response(result.id, status=status.HTTP_202_ACCEPTED)
 
 @api_view(['POST'])
@@ -22,6 +27,16 @@ def iop(request):
 
 @api_view(['GET'])
 def answer(request, pk):
+    result = AsyncResult(pk, app=app)
+
+    if result.ready():
+        return Response(result.get(), status=status.HTTP_200_OK, content_type='application/json; charset=utf-8')
+    else:
+        return Response(result.state, status=status.HTTP_200_OK, content_type='application/json; charset=utf-8')
+        # return Response(result.state, status=status.HTTP_404_NOT_FOUND, content_type='application/json; charset=utf-8')
+
+@api_view(['GET'])
+def answer_iop(request, pk):
     result = AsyncResult(pk, app=app)
 
     if result.ready():

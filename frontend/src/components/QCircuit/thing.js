@@ -112,6 +112,7 @@ const doubleClickTimeWindowMs = 500;
 export class QuantumCircuit extends React.Component {
 
   state = {
+    shots: 1024,
     loading: false,
     rate:[],
     options:[],
@@ -164,67 +165,11 @@ export class QuantumCircuit extends React.Component {
 
   onChange(value) {
     console.log('changed', value);
+    this.setState({
+      shots: value,
+    });
   }
 
-  trans(){
-    var op_list = this.state.blocks
-    var n = this.state.blocks.length
-    var pre_hiq = "from math import pi\n"+"import projectq\n"+"from projectq.backends import *\n"+"from projectq.ops import *\n"+"eng = projectq.MainEngine(backend=, verbose=True)\n"
-    // hiq_list=[[[] for col in range(10)] for row in range(10)]
-    var hiq_list=new Array();
-      for(var i=0;i<10;i++){
-        hiq_list[i]=new Array(); 
-        for(var j=0;j<10;j++){
-          hiq_list[i][j]=null;
-        }
-      }
-    var hiq = ''
-    for (k in range(n-1)){
-        for (i in range(n-1-k)){
-            if (op_list[i]['pos'][0]>op_list[i+1]['pos'][0]){
-                op_list[i],op_list[i+1] = op_list[i+1],op_list[i]
-            }
-        }
-    }
-    r=[0]*10
-    
-
-    for (i in range(n)){
-            k = op_list[i]['pos'][0]
-            j = op_list[i]['pos'][1]
-            hiq_list[k][j] = op_list[i]['type']           
-
-            
-            if  (j == 0){
-                hiq += hiq_list[k][j]
-                hiq += " | b1\n"
-                r[0] += 1
-                if (r[0] <= 1){
-                    pre_hiq += 'b1 =  eng.allocate_qubit()\n'
-                }
-            }
-            
-            if  (j == 1){
-                hiq += hiq_list[k][j]
-                hiq += " | b2\n"
-                r[1] += 1
-                if (r[1] <= 1){
-                    pre_hiq += 'b2 =  eng.allocate_qubit()\n'
-                }
-            }
-            
-            if  (j == 2){
-                hiq += hiq_list[k][j]
-                hiq += " | b3\n"
-                r[2] += 1
-                if (r[2] <= 1){
-                    pre_hiq += 'b3 =  eng.allocate_qubit()\n'
-                }
-    }
-    // print(pre_hiq+hiq)
-    }
-    return (pre_hiq+hiq)
-  }
   // ReactDOM.render(<InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />, mountNode);
 
   gen = () => {
@@ -246,7 +191,9 @@ export class QuantumCircuit extends React.Component {
     this.setState({ loading: true });
     request
     .post("http://localhost:8002/iop/", {
-      data: this.state.value
+      data: this.state.value,
+      shots: this.state.shots,
+      qubits: this.state.qregs.length,
     })
     .then(function(response) {
       console.log(response);

@@ -25,6 +25,30 @@ export async function sendCode(code: object) {
     .catch(function(error) {
       console.log(error);
     });
-
-
   }
+
+  export async function sendTask(code: object) {
+    request
+      .post("http://localhost:8002/question_iop/", {
+        data: code
+      })
+      .then(function(response) {
+        console.log(response);
+        return response
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+    }
+
+  export async function getTask(id: string) {
+    request
+      .get(`http://localhost:8002/question_iop/${id}`)
+      .then(function(response) {
+        console.log(response);
+        return response
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+    }
