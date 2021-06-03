@@ -1,6 +1,33 @@
 import requests
 
-def trans_iop_a(self):
+def trans_op(self):
+    #op转义函数，在‘前加两个反斜杠
+    #op为operation简写，即每个操作
+    if self == 'X':
+        return "\\'X\\'"
+    if self == 'Z':
+        return "\\'Z\\'"
+    if self == 'Y':
+        return "\\'Y\\'"
+    if self == "H":
+        return "\\'H\\'"
+    if self == 'Rx':
+        return "\\'Rx\\'"
+    if self == 'Ry':
+        return "\\'Ry\\'"
+    if self == 'Rz':
+        return "\\'Rz\\'"
+    if self == 'T':
+        return "\\'T\\'"
+    if self == 'CNOT':
+        return "\\'CNOT\\'"
+    if self == 'ISWAP':
+        return "\\'ISWAP\\'"
+
+def trans_iop_str(self, nqubits = 3 , layers = 4 ):
+
+##nqubits定义可以操作的量子比特数    
+##layers线路层数
     op_list = self["blocks"]
     n=len(op_list)
     last_iop = []
@@ -11,95 +38,89 @@ def trans_iop_a(self):
             if op_list[i]['pos'][0]>op_list[i+1]['pos'][0]:
                 op_list[i],op_list[i+1] = op_list[i+1],op_list[i]
     
-    r=[0]*10
-    op0 = []
-    op1 = []
-    op2 = []
+    r = [0] * nqubits
+    l = [0] * layers
+
+    op = [[]]*layers
+    
 
     for i in range(n):
             k = op_list[i]['pos'][0]
+            # k为线路深度即操作处在线路第几层
             j = op_list[i]['pos'][1]
+            # j为量子比特位
             hiq_list[k][j] = op_list[i]['type']           
 
+            for h in range(nqubits):
+                if  j == h:
+                    op_or = hiq_list[k][j]
+                    #op_or未处理的操作
+                    op_add = trans_op(op_or)
+                    #op_add加转义符后的操作
+                    if op_or == 'Measure':
+                        mea.append(j)
+                        continue
+    #                 op += "\\"
+                    op_str = "["
+                    op_str += op_add
+                    op_str += ","
+                    op_str += str(j)
+                    op_str += ","
+                    if op_list[i]['ctrls'] == []:
+                        para = 0
+                    else: 
+                        para = op_list[i]['ctrls'][0]
+
+                    op_str += str(para)
+                    op_str += "]"
+                    r[h] += 1
+                    #判定用到了哪几个比特位，在这个比特上作用一次就加一
+                    if r[h] <= 1:
+                        last_iop.append(j) 
+                    op_h = op_str
+                
+            for layer in range(layers):
+                op_or = hiq_list[k][j]
+                if op_or == 'Measure':
+                    l[k] += -1
+                if k == layer:
+                    l[k] += 1
+                    if l[k] <= 1:
+                        op[layer] = "["
+                        op[layer] += op_str
+                    if l[k] >1:
+                        op[layer] += ","
+                        op[layer] += op_str
+                    op_str = ""
+                    #刷新op_str
+
+
+    for layer in range(layers):
+        op[layer] += "],"
+        if l[layer] <= 0:
+            op[layer] = ""
+
+    
+    op_last = ""
+    for layer in range(layers):
+        op_last += op[layer]
+        
+    op_last += str(mea)
+    op_last += ","
+    op_last += str(last_iop)
+
+        
             
-            if  j == 0:
-                op = hiq_list[k][j]
-                if op == 'Measure':
-                    mea.append(j)
-                op_0 = []
-                op_0.append(op.lower())
-                op_0.append(j)
-                if op_list[i]['ctrls'] == []:
-                    para = 0
-                else: 
-                    para = op_list[i]['ctrls'][0]
-                    
-                op_0.append(para)
-                r[0] += 1
-                if r[0] <= 1:
-                    last_iop.append(j) 
-                op_h = []
-                op_h = op_0
-                  
-            if  j == 1:
-                op = hiq_list[k][j]
-                if op == 'Measure':
-                    mea.append(j)
-                op_1 = []
-                op_1.append(op.lower())
-                op_1.append(j)
-                if op_list[i]['ctrls'] == []:
-                    para = 0
-                else: 
-                    para = op_list[i]['ctrls'][0]
-                op_1.append(para)
-                
-                r[1] += 1
-                
-                if r[1] <= 1:
-                    last_iop.append(j) 
-                op_h = []
-                op_h = op_1
-            
-            if  j == 2:
-                op = hiq_list[k][j]
-                if op == 'Measure':
-                    mea.append(j)
-                op_2 = []
-                op_2.append(op.lower())
-                op_2.append(j)
-                if op_list[i]['ctrls'] == []:
-                    para = 0
-                else: 
-                    para = op_list[i]['ctrls'][0]
-                
-                op_2.append(para)
-                
-                r[2] += 1
-                if r[2] <= 1:
-                    last_iop.append(j) 
-                op_h = []
-                op_h = op_2
-                
-                    
-            if k == 0:
-                op0.append(op_h)
-            if k == 1:
-                op1.append(op_h)
-            if k == 2:
-                op2.append(op_h)
-                    
-            
-    return  op0,op1,op2,mea,last_iop
+    return  op_last
 
 def getResult(data):
     print(data)
-    body = trans_iop_a(data)
+    body = trans_iop_str(data)
     print(body)
     # return body
     request_body = {
-            'qtasm': "[[\\'H\\',0,0]],[0],[0]",
-            # 'qtasm': body,
+            # 'qtasm': "[[\\'H\\',0,0]],[0],[0]",
+            'qtasm': body,
             'shots': 1000,
             'qubits': 10,
             'selected_server': 0,
