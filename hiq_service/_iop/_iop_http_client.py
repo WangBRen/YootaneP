@@ -456,3 +456,19 @@ def send(info,
     except KeyError as err:
         print("- Failed to parse response:")
         print(err)
+
+def send_to_iop(data):
+    print(data)
+    request_body = {
+            # 'qtasm': "[[\\'H\\',0,0]],[0],[0]",
+            'qtasm': data,
+            'shots': 1000,
+            'qubits': 10,
+            'selected_server': 0,
+            'eyegod': 'false',
+            'eyeqt': 'false',
+            'remi': 'false',
+            'remifile': ''
+        }
+
+    return requests.post(_IOP_URL, data=request_body)

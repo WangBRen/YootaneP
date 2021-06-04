@@ -35,7 +35,7 @@ from projectq.ops import (NOT,
                           Barrier,
                           FlushGate)
 
-from ._iop_http_client import send, retrieve
+from ._iop_http_client import send, retrieve, send_to_iop
 
 
 class IOPBackend(BasicEngine):
@@ -248,59 +248,62 @@ class IOPBackend(BasicEngine):
         print(self._circ)
         print(self._Meas)
         print(self._map)
-        # self.iopqasm['Operators']= self._circ
-        # self.iopqasm['Measure']= self._Meas
-        # self.iopqasm['Qubits']= self._map
-        # self._json.append([self._circ[i] for i in self._circ])
-        # self._json.append(self._Meas)
-        # self._json.apped([Q_id for Q_id in self._map])
-        # max_qubit_id=max([Q_id for Q_id in self._map])
+        self.iopqasm['Operators']= self._circ
+        self.iopqasm['Measure']= self._Meas
+        self.iopqasm['Qubits']= self._map
+        self._json.append([self._circ[i] for i in self._circ])
+        self._json.append(self._Meas)
+        self._json.apped([Q_id for Q_id in self._map])
+        max_qubit_id=max([Q_id for Q_id in self._map])
 
-        # info = {}
-        # info['json']=self._json
-        # info['nq']=max_qubit_id
-        # info['shots'] = self._num_runs
-        # info['maxCredits'] = 10
-        # info['backend'] = {'name': self.device}
+        info = {}
+        info['json']=self._json
+        info['nq']=max_qubit_id
+        info['shots'] = self._num_runs
+        info['maxCredits'] = 10
+        info['backend'] = {'name': self.device}
 
-        # print(info)
-        # try:
-        #     if self._retrieve_execution is None:
-        #         res = send(info, device=self.device,
-        #                    token=self._token,
-        #                    num_retries=self._num_retries,
-        #                    interval=self._interval,
-        #                    verbose=self._verbose)
-        #     else:
-        #         res = retrieve(device=self.device,
-        #                        token=self._token,
-        #                        jobid=self._retrieve_execution,
-        #                        num_retries=self._num_retries,
-        #                        interval=self._interval,
-        #                        verbose=self._verbose)
-        #     counts = res['data']['counts']
-        #     # Determine random outcome
-        #     P = random.random()
-        #     p_sum = 0.
-        #     measured = ""
-        #     length=len(self._measured_ids)
-        #     for state in counts:
-        #         probability = counts[state] * 1. / self._num_runs
-        #         state="{0:b}".format(int(state,0))
-        #         state=state.zfill(max_qubit_id)
+        data = info['json']
 
-        #         state=state[::-1]
-        #         p_sum += probability
-        #         star = ""
-        #         if p_sum >= P and measured == "":
-        #             measured = state
-        #             star = "*"
-        #         self._probabilities[state] = probability
-        #         if self._verbose and probability > 0:
-        #             print(str(state) + " with p = " + str(probability) +
-        #                   star)
-        # except TypeError:
-        #     raise Exception("Failed to run the circuit. Aborting.")
+        print(info)
+        try:
+            if self._retrieve_execution is None:
+                # res = send(info, device=self.device,
+                #            token=self._token,
+                #            num_retries=self._num_retries,
+                #            interval=self._interval,
+                #            verbose=self._verbose)
+                res = send_to_iop(data)
+            else:
+                res = retrieve(device=self.device,
+                               token=self._token,
+                               jobid=self._retrieve_execution,
+                               num_retries=self._num_retries,
+                               interval=self._interval,
+                               verbose=self._verbose)
+            counts = res['data']['counts']
+            # Determine random outcome
+            P = random.random()
+            p_sum = 0.
+            measured = ""
+            length=len(self._measured_ids)
+            for state in counts:
+                probability = counts[state] * 1. / self._num_runs
+                state="{0:b}".format(int(state,0))
+                state=state.zfill(max_qubit_id)
+
+                state=state[::-1]
+                p_sum += probability
+                star = ""
+                if p_sum >= P and measured == "":
+                    measured = state
+                    star = "*"
+                self._probabilities[state] = probability
+                if self._verbose and probability > 0:
+                    print(str(state) + " with p = " + str(probability) +
+                          star)
+        except TypeError:
+            raise Exception("Failed to run the circuit. Aborting.")
 
     def receive(self, command_list):
         """
