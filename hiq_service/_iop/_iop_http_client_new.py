@@ -61,24 +61,24 @@ class IOP(Session):
                     device version 'version'
         """
         # 设备列表url
-        list_device_url = 'Network/ibm-q/Groups/open/Projects/main/devices/v/1'
-        argument = {'allow_redirects': True, 'timeout': (self.timeout, None)}
-        request = super(IOP, self).get(urljoin(_API_URL, list_device_url),
-                                        **argument)
-        request.raise_for_status()
-        r_json = request.json()
-        self.backends = dict()
-        for obj in r_json:
-            self.backends[obj['backend_name']] = {
-                'nq': obj['n_qubits'],
-                'coupling_map': obj['coupling_map'],
-                'version': obj['backend_version']
-            }
+        # list_device_url = 'Network/ibm-q/Groups/open/Projects/main/devices/v/1'
+        # argument = {'allow_redirects': True, 'timeout': (self.timeout, None)}
+        # request = super(IOP, self).get(urljoin(_API_URL, list_device_url),
+        #                                 **argument)
+        # request.raise_for_status()
+        # r_json = request.json()
+        # self.backends = dict()
+        # for obj in r_json:
+        #     self.backends[obj['backend_name']] = {
+        #         'nq': obj['n_qubits'],
+        #         'coupling_map': obj['coupling_map'],
+        #         'version': obj['backend_version']
+        #     }
 
-        if verbose:
-            print('- List of IOP devices available:')
-            print(self.backends)
-        return self.backends
+        # if verbose:
+        #     print('- List of IOP devices available:')
+        #     print(self.backends)
+        # return self.backends
 
     def is_online(self, device):
         """
@@ -113,27 +113,27 @@ class IOP(Session):
 
 
     #鉴权 暂无此功能
-    def _authenticate(self, token=None):
-        """
-        Args:
-            token (str): IBM quantum experience user API token.
-        """
-        if token is None:
-            token = getpass.getpass(prompt="token > ")
-        if len(token) == 0:
-            raise Exception('Error with the token')
-        self.headers.update({'X-Qx-Client-Application': CLIENT_APPLICATION})
-        args = {
-            'data': None,
-            'json': {
-                'apiToken': token
-            },
-            'timeout': (self.timeout, None)
-        }
-        request = super(IOP, self).post(_AUTH_API_URL, **args)
-        request.raise_for_status()
-        r_json = request.json()
-        self.params.update({'access_token': r_json['id']})
+    # def _authenticate(self, token=None):
+    #     """
+    #     Args:
+    #         token (str): IBM quantum experience user API token.
+    #     """
+    #     if token is None:
+    #         token = getpass.getpass(prompt="token > ")
+    #     if len(token) == 0:
+    #         raise Exception('Error with the token')
+    #     self.headers.update({'X-Qx-Client-Application': CLIENT_APPLICATION})
+    #     args = {
+    #         'data': None,
+    #         'json': {
+    #             'apiToken': token
+    #         },
+    #         'timeout': (self.timeout, None)
+    #     }
+    #     request = super(IOP, self).post(_AUTH_API_URL, **args)
+    #     request.raise_for_status()
+    #     r_json = request.json()
+    #     self.params.update({'access_token': r_json['id']})
 
     def _run(self, info, device):
         """
