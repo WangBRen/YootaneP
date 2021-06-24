@@ -4,11 +4,37 @@ from rest_framework.response import Response
 
 from celery.result import AsyncResult
 
-from hiq_service.tasks import ask, ask_iop
+from hiq_service.tasks import ask, ask_iop, execute
 from hiq_service.tasks import app
 from hiq_service.Task import get_task_list, create_task
 from iop import getResult
 import json
+
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser
+
+##上传代码文件接口
+class FileUploadView(APIView):
+    parser_classes = [FileUploadParser, ]
+
+    def put(self, request, filename, format=None):
+        #获取文件
+        file_obj = request.data['file']
+        #调用文件处理排队
+        result = execute.delay(file_obj, filename)
+        #返回任务id
+        return Response(result.id, status=status.HTTP_202_ACCEPTED)
+
+##通过id获取结果
+@api_view(['GET'])
+def result(request, pk):
+    result = AsyncResult(pk, app=app)
+
+    if result.ready():
+        return Response(result.get(), status=status.HTTP_200_OK, content_type='application/json; charset=utf-8')
+    else:
+        return Response(result.state, status=status.HTTP_200_OK, content_type='application/json; charset=utf-8')
+        # return Response(result.state, status=status.HTTP_404_NOT_FOUND, content_type='application/json; charset=utf-8')
 
 @api_view(['POST'])
 def question(request):

@@ -15,6 +15,7 @@ Including another URLconf
 """
 
 from django.conf.urls import url
+from django.urls import re_path
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -30,6 +31,9 @@ urlpatterns = [
     url(r'^question_iop/(?P<pk>[a-zA-Z0-9]{8}-([a-zA-Z0-9]{4}-){3}[a-zA-Z0-9]{12})/$', views.answer_iop),
     url(r'^task/$', views.task),
     url(r'^tasks', views.get_task),
+    #/上传接口的 URL 为 http://xx.xx.xx.xx/files/<filename> ，其中 <filenmae> 用于指定上传成功后在服务器端的文件名。使用 PUT 请求上传文件。
+    re_path(r'^files/(?P<filename>[^/]+)$', views.FileUploadView.as_view()),
+    url(r'^result/(?P<pk>[a-zA-Z0-9]{8}-([a-zA-Z0-9]{4}-){3}[a-zA-Z0-9]{12})/$', views.result),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -4,7 +4,6 @@ import os
 import sys
 sys.path.append('./hiq_service')
 import socket
-import zhinst.ziPython
 from iop import getResult
 
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', '')
@@ -16,10 +15,16 @@ app = Celery('tasks', broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND, i
 def ask(data):
     #操作并处理结果
     print(data)
-    dev = 'dev8276'
-    d = zhinst.ziPython.ziDiscovery()
-    props = d.get(d.find(dev))
-    return props
+    return data
+
+
+@app.task()
+def execute(file_obj, filename):
+    #对文件进行操作
+    with open(filename, 'wb') as f:
+        for chunk in file_obj.chunks():
+            f.write(chunk)
+    return filename
 
 @app.task()
 def ask_iop(data):

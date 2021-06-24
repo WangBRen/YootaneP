@@ -11,4 +11,3 @@ redis==2.10.6
 pymysql==0.8.0
 oss2==2.4.0
 pymongo==3.6.1
-zhinst
