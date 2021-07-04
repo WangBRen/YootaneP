@@ -22,6 +22,12 @@ export default [
     component: './Welcome',
   },
   {
+    path: '/jsoneditor',
+    name: '编辑器',
+    icon: 'smile',
+    component: './JsonEditor',
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',

@@ -14,7 +14,7 @@ export default defineConfig({
   },
   layout: {
     name: 'HiQASM',
-    locale: true,
+    locale: false,
     siderWidth: 208,
     ...defaultSettings,
   },
