@@ -1,3 +1,4 @@
+import os
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -70,6 +71,16 @@ def answer_iop(request, pk):
     else:
         return Response(result.state, status=status.HTTP_200_OK, content_type='application/json; charset=utf-8')
         # return Response(result.state, status=status.HTTP_404_NOT_FOUND, content_type='application/json; charset=utf-8')
+
+@api_view(['GET'])
+def path(request):
+    root = os.getcwd()
+    result = os.walk("/")
+    print(root)
+    print(result)
+    return Response(result, status=status.HTTP_200_OK, content_type='application/json; charset=utf-8')
+
+
 
 @api_view(['POST'])
 def task(request):

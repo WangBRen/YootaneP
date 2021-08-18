@@ -22,6 +22,12 @@ export default [
     component: './Welcome',
   },
   {
+    name: 'Bro',
+    icon: 'smile',
+    path: '/bros',
+    component: './bros',
+  },
+  {
     path: '/jsoneditor',
     name: '编辑器',
     icon: 'smile',
@@ -51,6 +57,12 @@ export default [
   {
     path: '/',
     redirect: '/welcome',
+  },
+  {
+    name: '个人设置',
+    icon: 'smile',
+    path: '/accountsettings',
+    component: './AccountSettings',
   },
   {
     component: './404',

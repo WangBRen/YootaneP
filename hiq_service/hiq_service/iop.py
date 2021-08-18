@@ -120,7 +120,7 @@ def getResult(data):
     # return body
     request_body = {
             # 'qtasm': "[[\\'H\\',0,0]],[0],[0]",
-            'qtasm': body,
+            "qtasm": "[['H',0,0]],[['CNOT',[0,1]]],[['CNOT',[1,2]]],[0,1,2],[0,1,2]", 
             'shots': 1000,
             'qubits': 10,
             'selected_server': 0,
@@ -130,4 +130,4 @@ def getResult(data):
             'remifile': ''
         }
 
-    return requests.post("http://q.iphy.ac.cn/test2.php", data=request_body)
+    return requests.post("http://q.iphy.ac.cn/scq_submit_task.php", data=request_body)

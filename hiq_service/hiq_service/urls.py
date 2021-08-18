@@ -34,6 +34,7 @@ urlpatterns = [
     #/上传接口的 URL 为 http://xx.xx.xx.xx/files/<filename> ，其中 <filenmae> 用于指定上传成功后在服务器端的文件名。使用 PUT 请求上传文件。
     re_path(r'^files/(?P<filename>[^/]+)$', views.FileUploadView.as_view()),
     url(r'^result/(?P<pk>[a-zA-Z0-9]{8}-([a-zA-Z0-9]{4}-){3}[a-zA-Z0-9]{12})/$', views.result),
+    url(r'^path/', views.path),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

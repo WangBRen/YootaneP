@@ -8,12 +8,12 @@ import 'jsoneditor-react/es/editor.min.css';
 import { UploadOutlined } from '@ant-design/icons';
 import { values } from 'lodash';
 import shortcut from "./shortcut.png"
+import { saveAs } from 'file-saver';
 
 export default class JsonEditor extends React.PureComponent {
   state = {
     value: {
-      key1: 123,
-      key2: "string"
+      key1: 123
     },
   };
 
@@ -30,7 +30,7 @@ export default class JsonEditor extends React.PureComponent {
       const reader = new FileReader();         //实例化一个FileReader对象
       reader.readAsText(fileData, "gbk");          //借助 FileReader 的方法，按照文本格式读入文件，第二个参数是编码方式（可空）
       reader.onload = function() {
-        var tmp1 = this.result;    
+        var tmp1 = this.result;
         console.log(tmp1)
         const JsonValue = JSON.parse(tmp1);
         console.log(JsonValue)
@@ -46,6 +46,14 @@ export default class JsonEditor extends React.PureComponent {
     this.setState({
       value,
     });
+  };
+
+  handleSave = () => {
+    var data = this.state.value
+    var content = JSON.stringify(data);
+    var blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+
+    saveAs(blob, "export.json");
   };
 
   prompt = async() => {
@@ -66,8 +74,8 @@ export default class JsonEditor extends React.PureComponent {
 
   render() {
     return (
-      <Card title="编辑器">
-        <Editor 
+      <Card title="编辑">
+        <Editor
             key={Date.now()}
             value={this.state.value}
             onChange={this.handleChange}
@@ -83,7 +91,7 @@ export default class JsonEditor extends React.PureComponent {
               style={{
                 margin: 12,
               }}
-              type="primary" onClick={this.prompt}>保存文件</Button>
+              type="primary" onClick={this.handleSave}>保存文件</Button>
               <Button
               style={{
                 margin: 12,
