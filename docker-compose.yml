@@ -2,72 +2,21 @@ version: '3'
 
 services:
 
-  hiq-redis:
-    image: redis:alpine
-    restart: always
-    tty: true
-    ports:
-      - "6379:6379"
-    volumes:
-      - "${REDIS_DATA_DIR}:/data"
-    networks:
-      - hiq-network
-    deploy:
-      replicas: 1
-
-  hiq-redis-commander:
-    # image: tenstartups/redis-commander
-    image: rediscommander/redis-commander
-    restart: always
-    environment:
-      - REDIS_HOSTS=hiq-redis
-    # command: --redis-host hiq-redis
-    tty: true
-    ports:
-      - "8081:8081"
-    networks:
-      - hiq-network
-    deploy:
-      replicas: 1
-
-  hiq-rabbitmq:
-    image: rabbitmq:management-alpine 
-    restart: always
-    tty: true
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER}"
-      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS}"
-    hostname: hiq-rabbitmq-host
-    volumes:
-      - ${RABBITMQ_DATA_DIR}:/var/lib/rabbitmq/mnesia
-    networks:
-      - hiq-network
-    deploy:
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.role == manager
-      replicas: 1
-      
-
-  hiq-service:
+  yt-service:
     env_file:
       - .env
     build:
-      context: ./hiq_service
+      context: ./yt_service
       dockerfile: service.Dockerfile
-    image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/hiq-service"
+    image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/yt-service"
     restart: always
     tty: true
-    command: /usr/bin/supervisord -n
+    # command: /usr/bin/supervisord -n
+    command: python3 manage.py runserver 0.0.0.0:9090
     ports:
-      - "8000:8000"
+      - "9090:9090"
     networks:
-      - hiq-network
+      - yt-network
     deploy:
       replicas: 1
       update_config:
@@ -75,134 +24,6 @@ services:
         delay: 20s
       restart_policy:
         condition: on-failure
-
-  hiq-worker:
-    env_file:
-      - .env
-    build:
-      context: ./hiq_service
-      dockerfile: worker.Dockerfile
-    image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/hiq-worker"
-    restart: always
-    tty: true
-    # command: celery worker -A hiq_service.tasks --loglevel=INFO
-    networks:
-      - hiq-network
-    ports:
-        - "8004:8004"
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 20s
-      restart_policy:
-        condition: on-failure
-
-  hiq-mysql:
-    build:
-      context: ./mysql
-      dockerfile: Dockerfile
-    image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/hiq-mysql"
-    env_file:
-      - .env
-    environment:
-      MYSQL_USER: dbuser
-      MYSQL_PASSWORD: userpass
-      MYSQL_DATABASE: "${MYSQL_DB_NAME}"
-      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD}"
-    restart: always
-    tty: true
-    ports:
-      - "3306:3306"
-    networks:
-      - hiq-network
-    deploy:
-      replicas: 1
-
-  hiq-mongodb:
-    build:
-      context: ./mongodb
-      dockerfile: Dockerfile
-    image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/hiq-mongodb"
-    env_file:
-      - .env
-    restart: always
-    tty: true
-    ports:
-      - "27017:27017"
-    networks:
-      - hiq-network
-    deploy:
-      replicas: 1
-        
-  # hiq-wechat-miniapp:
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - VIRTUAL_HOST=localhost
-  #   build:
-  #     context: ./hiq_wechat_java
-  #     dockerfile: Dockerfile
-  #   image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/hiq-wechat-miniapp"
-  #   restart: always
-  #   tty: true
-  #   ports:
-  #     - "12000:12000"
-  #   networks:
-  #     - hiq-network
-  #   deploy:
-  #     replicas: 2
-  #     update_config:
-  #       parallelism: 1
-  #       delay: 20s
-  #     restart_policy:
-  #       condition: on-failure
-
-  # wx-boot:
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - VIRTUAL_HOST=localhost
-  #   build:
-  #     context: ./wx-boot
-  #     dockerfile: Dockerfile
-  #   image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/wx-boot"
-  #   restart: always
-  #   tty: true
-  #   ports:
-  #     - "12001:12001"
-  #   networks:
-  #     - hiq-network
-  #   deploy:
-  #     replicas: 2
-  #     update_config:
-  #       parallelism: 1
-  #       delay: 30s
-  #     restart_policy:
-  #       condition: on-failure
-
-
-  # hiq-ha-proxy:
-  #   env_file:
-  #     - .env
-  #   build:
-  #     context: ./ha_proxy
-  #     dockerfile: Dockerfile
-  #   image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/hiq-ha-proxy"
-  #   restart: always
-  #   tty: true
-  #   ports:
-  #     - '80:80'
-  #     - '443:443'
-  #   networks:
-  #     - hiq-network
-  #   deploy:
-  #     replicas: 2
-  #     update_config:
-  #       parallelism: 1
-  #       delay: 20s
-  #     restart_policy:
-  #       condition: on-failure
 
 networks:
-  hiq-network:
+  yt-network:
