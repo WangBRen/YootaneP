@@ -26,6 +26,7 @@ router = routers.DefaultRouter()
 urlpatterns = [
     url(r'^path/', views.path),
     url(r'^ecg/', views.qrs),
+    url(r'^predict/', views.predict),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
