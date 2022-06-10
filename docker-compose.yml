@@ -3,12 +3,12 @@ version: '3'
 services:
 
   yt-service:
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     build:
       context: ./yt_service
       dockerfile: service.Dockerfile
-    image: "${DOCKER_REGISTRY_URL}/${DOCKER_PROJECT}/${ENV}/yt-service"
+    image: "yt-service"
     restart: always
     tty: true
     # command: /usr/bin/supervisord -n
