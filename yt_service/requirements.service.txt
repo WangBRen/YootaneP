@@ -1,4 +1,4 @@
-numpy==1.21.2
+numpy==1.19.5
 Django==2.0.2
 django-extensions==1.9.8
 djangorestframework==3.7.3
