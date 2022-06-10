@@ -97,8 +97,7 @@ def predict_func(data):
         each_x=each_x+[0]
     
     each_x=np.array([each_x])
-    stdsc=StandardScaler().fit(each_x[:,:-1])#正态分布标准化数据的函数
-    X_std=stdsc.fit_transform(each_x[:,:-1])
+    X_std=stdsc.transform(each_x[:,:-1])
     X_std = np.concatenate((X_std,each_x[:,-1:]),axis=1)
     
     if not is_new_patient:
