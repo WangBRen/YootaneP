@@ -20,6 +20,7 @@ FROM python:3.7
 WORKDIR /usr/src/app
 RUN mkdir ./log
 COPY . .
+RUN pip install --upgrade pip
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir -r requirements.service.txt
 # RUN pip install -r requirements.service.txt
 EXPOSE 9090
